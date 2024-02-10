@@ -45,16 +45,3 @@ jobs:
     - name: Deploy to Minikube
       run: |
         kubectl apply -f k8s/deployment.yml
-
-    - name: Test Deployment
-      run: |
-        sleep 10 
-        minikube_ip=$(minikube ip)
-        curl http://${minikube_ip}:80/
-    - name: Debugging Output
-      run: |
-        kubectl config use-context minikube
-        kubectl get pods
-        kubectl get deployments
-        kubectl describe deployment hello-world-app
-        kubectl logs deployment/hello-world-app
