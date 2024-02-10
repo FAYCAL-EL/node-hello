@@ -49,3 +49,10 @@ jobs:
       run: |
         sleep 10 
         curl http://localhost:80/
+    - name: Debugging Output
+      run: |
+        kubectl config use-context minikube
+        kubectl get pods
+        kubectl get deployments
+        kubectl describe deployment hello-world-app
+        kubectl logs deployment/hello-world-app
