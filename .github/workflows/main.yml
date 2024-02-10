@@ -30,16 +30,26 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
+    - name: Code Quality Check
+      run: |
+        npm install -g eslint
+        eslint .
+
     - name: Build and Push Docker Image
       run: |
         docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-world-app .
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker push ${{ secrets.DOCKER_USERNAME }}/hello-world-app
 
+    - name: Security Scans
+      run: |
+        trivy --exit-code 0 ${{ secrets.DOCKER_USERNAME }}/hello-world-app
+        dependency-check --project "helloWorld" --scan .
+
     - name: Deploy to Minikube
       run: |
         kubectl apply -f k8s/deployment.yml
 
-    - name: Security Scans
+    - name: Test Deployment
       run: |
-        trivy --exit-code 0 ${{ secrets.DOCKER_USERNAME }}/hello-world-app
+        curl http://localhost:3000/
