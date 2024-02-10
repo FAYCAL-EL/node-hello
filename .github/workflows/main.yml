@@ -13,6 +13,15 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
+    - name: Set up Minikube
+      run: |
+        sudo apt update
+        sudo apt install -y conntrack
+        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        sudo install minikube-linux-amd64 /usr/local/bin/minikube
+        minikube start --driver=docker
+        kubectl config use-context minikube
+
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
@@ -29,7 +38,6 @@ jobs:
 
     - name: Deploy to Minikube
       run: |
-        kubectl config use-context minikube
         kubectl apply -f k8s/deployment.yaml
 
     - name: Security Scans
