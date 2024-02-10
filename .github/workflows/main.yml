@@ -30,6 +30,14 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
+    - name: Install Clair
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget
+        wget https://github.com/quay/clair/releases/download/v4.3.0/clair-v4.3.0-linux-amd64.tar.gz
+        tar -xzf clair-v4.3.0-linux-amd64.tar.gz
+        sudo mv clair /usr/local/bin
+
     - name: Code Quality Check
       run: |
         npm install -g eslint
@@ -43,13 +51,8 @@ jobs:
 
     - name: Security Scans
       run: |
-        sudo apt-get install wget
-        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-        echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -cs) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-        sudo apt-get update
-        sudo apt-get install trivy
-        trivy --exit-code 0 ${{ secrets.DOCKER_USERNAME }}/hello-world-app
-        dependency-check . --project "HelloWorld" --scan .
+        clair-scanner -c http://localhost:6060 ${{ secrets.DOCKER_USERNAME }}/hello-world-app
+        dependency-check --project "node-hello" --scan .
 
     - name: Deploy to Minikube
       run: |
