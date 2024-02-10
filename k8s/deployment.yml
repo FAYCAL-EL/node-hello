@@ -14,9 +14,13 @@ spec:
     spec:
       containers:
         - name: hello-world-app
-          image: ${{ secrets.DOCKER_USERNAME }}/hello-world-app:latest
+          image: filohero/hello-world-app:latest
           ports:
             - containerPort: 3000
+          resources:
+            limits:
+              cpu: "0.7"
+              memory: "512Mi"
 ---
 apiVersion: v1
 kind: Service
